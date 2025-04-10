@@ -1,14 +1,17 @@
 package com.test.ids.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.test.ids.dto.ProductResponseDTO;
+import com.test.ids.dto.request.AddProductRequest;
 import com.test.ids.model.Product;
 import com.test.ids.repository.ProductDb;
+import com.test.ids.repository.StatusDb;
 
 import jakarta.transaction.Transactional;
 
@@ -17,6 +20,9 @@ import jakarta.transaction.Transactional;
 public class ProductService {
   @Autowired
   private ProductDb productDb;
+
+  @Autowired
+  private StatusDb statusDb;
 
   public List<ProductResponseDTO> getAllProduct(){
     List<Product> products = productDb.findAll();
@@ -27,6 +33,23 @@ public class ProductService {
     }
 
     return productResponse;
+  }
+
+  public void addProduct(AddProductRequest productDTO) {
+    System.out.println(productDTO);
+
+    Product product = new Product();
+    product.setProductID(productDTO.getProductID());
+    product.setProductName(productDTO.getProductName());
+    product.setAmount(productDTO.getAmount());
+    product.setCustomerName(productDTO.getCustomerName());
+    product.setTransactionDate(productDTO.getTransactionDate());
+    product.setCreateBy(productDTO.getCreateBy());
+    product.setCreateOn(productDTO.getCreateOn());
+
+    product.setStatus(statusDb.findById(productDTO.getStatus()).orElse(null));
+
+    productDb.save(product);
   }
 
   public void addListProduct(List<Product> product) {
